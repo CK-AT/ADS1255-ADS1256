@@ -7,13 +7,15 @@
 #ifndef ADS1256_h
 #define ADS1256_h
 
-#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
+/*#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
+    #warning  "__AVR_ATmega328P__!"
 
     #define pinDRDY 9
     #define pinRST  8
     #define pinCS   10 
     
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+    #warning  "__AVR_ATmega1280__!"
 
     #define pinDRDY 49
     #define pinRST  48
@@ -21,21 +23,25 @@
 	
  // Contributions are welcome   
 #elif   defined(ARDUINO_ARCH_ESP8266)
+    #warning  "ARDUINO_ARCH_ESP8266!"
 //https://esp8266-shop.com/esp8266-guide/esp8266-nodemcu-pinout/
     #define pinDRDY D0
     #define pinRST  D1
-    #define pinCS   D8 // D8 Hw Cs in esp8266
+    #define pinCS   D8 // D8 Hw Cs in esp8266*/
 
-#elif   defined(ARDUINO_ARCH_ESP32)
+//#elif   defined(ARDUINO_ARCH_ESP32) || defined(ESP32)
+    #warning  "ESP32!"
 	// Contributions are welcome
     //https://circuits4you.com/wp-content/uploads/2018/12/ESP32-Pinout.jpg
     #define pinDRDY 17
     #define pinRST  16
-    #define pinCS   5 //  
-#else 
+    #define pinCS   5 
+
+
+/*#else 
 	// Contributions are welcome
 	#warning  "Oops! Pins for your board are not defined: pinDRDY, pinRST, pinCS"
-#endif
+#endif*/
 
 // ADS1256 Register address
 #define ADS1256_RADD_STATUS 0x00
@@ -126,6 +132,7 @@
 class ADS1256 {
  public:
   ADS1256(float clockspdMhz, float vref, bool useresetpin);
+  void initSpi(float clockspdMhz);
   void writeRegister(unsigned char reg, unsigned char wdata);
   unsigned char readRegister(unsigned char reg);
   void sendCommand(unsigned char cmd);

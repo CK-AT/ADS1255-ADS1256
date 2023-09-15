@@ -28,9 +28,26 @@ ADS1256::ADS1256(float clockspdMhz, float vref, bool useResetPin) {
   _conversionFactor = 1.0;
 
   // Start SPI on a quarter of ADC clock speed
+  /*SPI.begin();
+  //SPI.begin(SCK, MISO, MOSI, SS);;
+  SPI.beginTransaction(
+      SPISettings(clockspdMhz * 1000000 / 4, MSBFIRST, SPI_MODE1));*/
+}
+
+void ADS1256::initSpi(float clockspdMhz)
+{
+  // Start SPI on a quarter of ADC clock speed
+  
+  Serial.println("SPI init: start");
   SPI.begin();
+  //SPI.begin(SCK, MISO, MOSI, SS);;
+
+  delay(500);
   SPI.beginTransaction(
       SPISettings(clockspdMhz * 1000000 / 4, MSBFIRST, SPI_MODE1));
+
+      Serial.println("SPI init: end");
+
 }
 
 void ADS1256::writeRegister(unsigned char reg, unsigned char wdata) {
