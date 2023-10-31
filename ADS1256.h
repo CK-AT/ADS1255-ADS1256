@@ -5,11 +5,9 @@
 */
 
 
-
 #ifndef ADS1256_h
 #define ADS1256_h
 
-#include "Main.h"
 
 // ADS1256 Register address
 #define ADS1256_RADD_STATUS 0x00
@@ -99,7 +97,7 @@
 
 class ADS1256 {
  public:
-  ADS1256(float clockspdMhz, float vref, bool useresetpin);
+    ADS1256(float clockspdMhz, float vref, bool useresetpin, uint8_t pin_drdy, uint8_t pin_sck, uint8_t pin_miso, uint8_t pin_mosi, uint8_t pin_cs);
   void initSpi(float clockspdMhz);
   void writeRegister(unsigned char reg, unsigned char wdata);
   unsigned char readRegister(unsigned char reg);

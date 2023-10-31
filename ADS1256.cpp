@@ -8,11 +8,29 @@
 #include "Arduino.h"
 #include "SPI.h"
 
-ADS1256::ADS1256(float clockspdMhz, float vref, bool useResetPin) {
+// global definitions of pins
+uint8_t PIN_DRDY=19;
+uint8_t PIN_RST=16;
+uint8_t PIN_SCK=16;
+uint8_t PIN_MISO=18;
+uint8_t PIN_MOSI=17;
+uint8_t PIN_CS=21;
+
+ADS1256::ADS1256(float clockspdMhz, float vref, bool useResetPin
+                 , uint8_t pin_drdy, uint8_t pin_sck, uint8_t pin_miso, uint8_t pin_mosi, uint8_t pin_cs) {
+    
+    // overwrite pins as needed
+    PIN_DRDY = pin_drdy;
+    PIN_SCK = pin_sck;
+    PIN_MISO = pin_miso;
+    PIN_MOSI = pin_mosi;
+    PIN_CS = pin_cs;
+    
+    
   // Set DRDY as input
   pinMode(PIN_DRDY, INPUT);
   // Set CS as output
-  pinMode(pinCS, OUTPUT);
+  pinMode(PIN_CS, OUTPUT);
   
   if (useResetPin) {
     // set RESETPIN as output
@@ -270,11 +288,11 @@ uint8_t ADS1256::getStatus() {
 
 void ADS1256::CSON() {
   //PORT_CS &= ~(1 << PINDEX_CS);
-  digitalWrite(pinCS, LOW);
+  digitalWrite(PIN_CS, LOW);
 }  // digitalWrite(_CS, LOW); }
 
 void ADS1256::CSOFF() {
-  digitalWrite(pinCS, HIGH);
+  digitalWrite(PIN_CS, HIGH);
   //PORT_CS |= (1 << PINDEX_CS);
 }  // digitalWrite(_CS, HIGH); }
 
