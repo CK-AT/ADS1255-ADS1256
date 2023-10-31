@@ -1,47 +1,15 @@
 /*
         ADS1256.h - Arduino Library for communication with Texas Instrument ADS1256 ADC
         Written by Adien Akhmad, August 2015
-	Modifified  Jan 2019 by Axel Sepulveda for ATMEGA328
+    Modifified  Jan 2019 by Axel Sepulveda for ATMEGA328
 */
+
+
 
 #ifndef ADS1256_h
 #define ADS1256_h
 
-/*#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
-    #warning  "__AVR_ATmega328P__!"
-
-    #define pinDRDY 9
-    #define pinRST  8
-    #define pinCS   10 
-    
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-    #warning  "__AVR_ATmega1280__!"
-
-    #define pinDRDY 49
-    #define pinRST  48
-    #define pinCS   53 
-	
- // Contributions are welcome   
-#elif   defined(ARDUINO_ARCH_ESP8266)
-    #warning  "ARDUINO_ARCH_ESP8266!"
-//https://esp8266-shop.com/esp8266-guide/esp8266-nodemcu-pinout/
-    #define pinDRDY D0
-    #define pinRST  D1
-    #define pinCS   D8 // D8 Hw Cs in esp8266*/
-
-//#elif   defined(ARDUINO_ARCH_ESP32) || defined(ESP32)
-    #warning  "ESP32!"
-	// Contributions are welcome
-    //https://circuits4you.com/wp-content/uploads/2018/12/ESP32-Pinout.jpg
-    #define pinDRDY 17
-    #define pinRST  16
-    #define pinCS   5 
-
-
-/*#else 
-	// Contributions are welcome
-	#warning  "Oops! Pins for your board are not defined: pinDRDY, pinRST, pinCS"
-#endif*/
+#include "Main.h"
 
 // ADS1256 Register address
 #define ADS1256_RADD_STATUS 0x00
@@ -104,7 +72,7 @@
 
 // define drate codes
 /*
-        NOTE : 	Data Rate vary depending on crystal frequency. Data rates
+        NOTE :     Data Rate vary depending on crystal frequency. Data rates
    listed below assumes the crystal frequency is 7.68Mhz
                 for other frequency consult the datasheet.
 */
@@ -143,7 +111,7 @@ class ADS1256 {
   void setChannel(byte AIP, byte AIN);
   void begin(unsigned char drate, unsigned char gain, bool bufferenable);
   void begin();
-  uint8_t getStatus();  
+  uint8_t getStatus();
   void waitDRDY();
   boolean isDRDY();
   void setGain(uint8_t gain);

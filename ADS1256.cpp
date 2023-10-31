@@ -1,7 +1,7 @@
 /*
         ADS1256.h - Arduino Library for communication with Texas Instrument ADS1256 ADC
         Written by Adien Akhmad, August 2015
-		Modfified  Jan 2019 by Axel Sepulveda for ATMEGA328
+        Modfified  Jan 2019 by Axel Sepulveda for ATMEGA328
 */
 
 #include "ADS1256.h"
@@ -10,15 +10,15 @@
 
 ADS1256::ADS1256(float clockspdMhz, float vref, bool useResetPin) {
   // Set DRDY as input
-  pinMode(pinDRDY, INPUT);      
+  pinMode(PIN_DRDY, INPUT);
   // Set CS as output
   pinMode(pinCS, OUTPUT);
   
   if (useResetPin) {
     // set RESETPIN as output
-    pinMode(pinRST, OUTPUT );
+    pinMode(PIN_RST, OUTPUT );
     // pull RESETPIN high
-    pinMode(pinRST, HIGH);
+    pinMode(PIN_RST, HIGH);
   }
 
   // Voltage Reference
@@ -39,8 +39,8 @@ void ADS1256::initSpi(float clockspdMhz)
   // Start SPI on a quarter of ADC clock speed
   
   Serial.println("SPI init: start");
-  SPI.begin();
-  //SPI.begin(SCK, MISO, MOSI, SS);;
+  //SPI.begin();
+  SPI.begin(PIN_SCK, PIN_MISO, PIN_MOSI, PIN_CS);
 
   delay(500);
   SPI.beginTransaction(
@@ -55,7 +55,7 @@ void ADS1256::writeRegister(unsigned char reg, unsigned char wdata) {
   SPI.transfer(ADS1256_CMD_WREG | reg); // opcode1 Write registers starting from reg
   SPI.transfer(0);  // opcode2 Write 1+0 registers
   SPI.transfer(wdata);  // write wdata
-  delayMicroseconds(1);              
+  delayMicroseconds(1);
   CSOFF();
 }
 
@@ -64,9 +64,9 @@ unsigned char ADS1256::readRegister(unsigned char reg) {
   CSON();
   SPI.transfer(ADS1256_CMD_RREG | reg); // opcode1 read registers starting from reg
   SPI.transfer(0);                  // opcode2 read 1+0 registers
-  delayMicroseconds(7);              //  t6 delay (4*tCLKIN 50*0.13 = 6.5 us)    
+  delayMicroseconds(7);              //  t6 delay (4*tCLKIN 50*0.13 = 6.5 us)
   readValue = SPI.transfer(0);          // read registers
-  delayMicroseconds(1);              //  t11 delay (4*tCLKIN 4*0.13 = 0.52 us)    
+  delayMicroseconds(1);              //  t11 delay (4*tCLKIN 4*0.13 = 0.52 us)
   CSOFF();
   return readValue;
   
@@ -76,7 +76,7 @@ void ADS1256::sendCommand(unsigned char reg) {
   CSON();
   waitDRDY();
   SPI.transfer(reg);
-  delayMicroseconds(1);              //  t11 delay (4*tCLKIN 4*0.13 = 0.52 us)    
+  delayMicroseconds(1);              //  t11 delay (4*tCLKIN 4*0.13 = 0.52 us)
   CSOFF();
 }
 
@@ -86,7 +86,7 @@ void ADS1256::readTest() {
   unsigned char _highByte, _midByte, _lowByte;
   CSON();
   SPI.transfer(ADS1256_CMD_RDATA);
-  delayMicroseconds(7);              //  t6 delay (4*tCLKIN 50*0.13 = 6.5 us)    
+  delayMicroseconds(7);              //  t6 delay (4*tCLKIN 50*0.13 = 6.5 us)
 
   _highByte = SPI.transfer(ADS1256_CMD_WAKEUP);
   _midByte = SPI.transfer(ADS1256_CMD_WAKEUP);
@@ -98,7 +98,7 @@ void ADS1256::readTest() {
 float ADS1256::readCurrentChannel() {
   CSON();
   SPI.transfer(ADS1256_CMD_RDATA);
-  delayMicroseconds(7);              //  t6 delay (4*tCLKIN 50*0.13 = 6.5 us)              
+  delayMicroseconds(7);              //  t6 delay (4*tCLKIN 50*0.13 = 6.5 us)
   float adsCode = read_float32();
   CSOFF();
   return ((adsCode / 0x7FFFFF) * ((2 * _VREF) / (float)_pga)) *
@@ -109,7 +109,7 @@ float ADS1256::readCurrentChannel() {
 long ADS1256::readCurrentChannelRaw() {
   CSON();
   SPI.transfer(ADS1256_CMD_RDATA);
-  delayMicroseconds(7);              //  t6 delay (4*tCLKIN 50*0.13 = 6.5 us)       
+  delayMicroseconds(7);              //  t6 delay (4*tCLKIN 50*0.13 = 6.5 us)
   long adsCode = read_int32();
   CSOFF();
   return adsCode;
@@ -228,18 +228,18 @@ void ADS1256::setChannel(byte AIN_P, byte AIN_N) {
 
 /*
 Init chip with set datarate and gain and perform self calibration
-*/ 
+*/
 void ADS1256::begin(unsigned char drate, unsigned char gain, bool buffenable) {
   _pga = 1 << gain;
   sendCommand(ADS1256_CMD_SDATAC);  // send out ADS1256_CMD_SDATAC command to stop continous reading mode.
-  writeRegister(ADS1256_RADD_DRATE, drate);  // write data rate register   
+  writeRegister(ADS1256_RADD_DRATE, drate);  // write data rate register
   uint8_t bytemask = B00000111;
   uint8_t adcon = readRegister(ADS1256_RADD_ADCON);
   uint8_t byte2send = (adcon & ~bytemask) | gain;
   writeRegister(ADS1256_RADD_ADCON, byte2send);
-  if (buffenable) {  
-    uint8_t status = readRegister(ADS1256_RADD_STATUS);   
-    bitSet(status, 1); 
+  if (buffenable) {
+    uint8_t status = readRegister(ADS1256_RADD_STATUS);
+    bitSet(status, 1);
     writeRegister(ADS1256_RADD_STATUS, status);
   }
   sendCommand(ADS1256_CMD_SELFCAL);  // perform self calibration
@@ -250,20 +250,20 @@ void ADS1256::begin(unsigned char drate, unsigned char gain, bool buffenable) {
 
 /*
 Init chip with default datarate and gain and perform self calibration
-*/ 
+*/
 void ADS1256::begin() {
   sendCommand(ADS1256_CMD_SDATAC);  // send out ADS1256_CMD_SDATAC command to stop continous reading mode.
-  uint8_t status = readRegister(ADS1256_RADD_STATUS);      
-  sendCommand(ADS1256_CMD_SELFCAL);  // perform self calibration  
+  uint8_t status = readRegister(ADS1256_RADD_STATUS);
+  sendCommand(ADS1256_CMD_SELFCAL);  // perform self calibration
   waitDRDY();   // wait ADS1256 to settle after self calibration
 }
 
 /*
 Reads and returns STATUS register
-*/ 
+*/
 uint8_t ADS1256::getStatus() {
   sendCommand(ADS1256_CMD_SDATAC);  // send out ADS1256_CMD_SDATAC command to stop continous reading mode.
-  return readRegister(ADS1256_RADD_STATUS); 
+  return readRegister(ADS1256_RADD_STATUS);
 }
 
 
@@ -280,9 +280,9 @@ void ADS1256::CSOFF() {
 
 void ADS1256::waitDRDY() {
   //while (PIN_DRDY & (1 << PINDEX_DRDY));
-  while (digitalRead(pinDRDY));
+  while (digitalRead(PIN_DRDY));
 }
 
 boolean ADS1256::isDRDY() {
-  return !digitalRead(pinDRDY);
-}	
+  return !digitalRead(PIN_DRDY);
+}
