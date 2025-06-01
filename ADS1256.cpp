@@ -56,7 +56,6 @@ void ADS1256::initSpi(float clockspdMhz)
 {
   // Start SPI on a quarter of ADC clock speed
   
-  Serial.println("SPI init: start");
   //SPI.begin();
   SPI.begin(PIN_SCK, PIN_MISO, PIN_MOSI, PIN_CS);
 
@@ -64,7 +63,6 @@ void ADS1256::initSpi(float clockspdMhz)
   SPI.beginTransaction(
       SPISettings(clockspdMhz * 1000000 / 4, MSBFIRST, SPI_MODE1));
 
-      Serial.println("SPI init: end");
 
 }
 
